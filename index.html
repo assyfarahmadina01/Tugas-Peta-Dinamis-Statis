@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jenis dan Contoh Peta</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 400px; margin-top: 20px; }
+    .card-custom {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .img-background {
+        background-image: url('kampus.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 150px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <header class="text-center mb-5">
+      <h1 class="fw-bold text-primary">Jenis dan Contoh Peta dalam Sistem Informasi Geografis</h1>
+      <p class="text-muted">Penerapan peta statis dan dinamis menggunakan metode SIG</p>
+    </header>
+
+    <!-- Peta Statis -->
+    <div class="card card-custom mb-5 p-4">
+      <h2 class="h5 text-dark">Peta Statis: Persebaran Banjir Sungai Martapura Barat</h2>
+      <img src="D:\semester 6\prak sigter\pert 2\interpretasi multiple ring buffer.jpg" alt="Peta Banjir Martapura Barat" class="img-fluid rounded mb-3 shadow-sm">
+      <p class="text-justify">
+        Peta ini menggambarkan analisis jarak sekitar Sungai Martapura dengan menggunakan metode multiple ring buffer. Analisis dilakukan dengan menentukan radius bertingkat, mulai dari 0–25 m hingga 100–125 m, untuk melihat bagaimana penggunaan lahan di sekitar sungai. Data yang digunakan adalah hasil overlay shapefile penutupan lahan seperti perkebunan, permukiman, dan sawah. Hasil analisis menunjukkan bahwa banyak permukiman dan fasilitas pendidikan berada dekat dengan sungai, khususnya di sekitar SDN Sungai Martapura 2 dan Sungai Keramat 3. Peta ini disajikan dalam bentuk gambar statis setelah proses layouting di ArcGIS, yang disertai dengan legenda dan simbol yang jelas, serta informasi terkait yang menjelaskan kawasan yang terdampak.
+      </p>
+      <p>Sekolah dan jalan yang berada di dalam buffer ini berpotensi terdampak saat banjir besar terjadi.</p>
+    </div>
+
+    <!-- Peta Dinamis -->
+    <div class="card card-custom p-4 mb-4">
+      <h2 class="h5 text-dark">Peta Dinamis: Jaringan Transportasi Menuju Bandara Internasional Minangkabau</h2>
+      <div id="map" class="rounded shadow-sm"></div>
+      <p class="mt-3 text-justify">
+        Peta dinamis ini menunjukkan analisis jaringan transportasi umum di Kota Padang, yang menghubungkan berbagai titik transportasi dengan Bandara Internasional Minangkabau. Menggunakan perangkat lunak QGIS, peta ini menghitung waktu tempuh tercepat dari stasiun dan terminal menuju bandara berdasarkan data waktu dalam atribut “minutes.” Pengguna dapat berinteraksi dengan peta ini melalui website, mengeklik masing-masing titik untuk melihat informasi waktu perjalanan dan titik keberangkatan. Titik transportasi di Lubuk Buaya memiliki waktu tempuh tercepat yaitu 15,7 menit, sedangkan yang terlama adalah dari Indarung dengan waktu 44 menit. Peta ini dibuat interaktif menggunakan JavaScript dan library Leaflet, memungkinkan pengunjung untuk mengeksplorasi data secara langsung melalui browser.
+      </p>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="signet-webmap.html" class="btn btn-outline-primary">Kembali ke Halaman Utama</a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+   var map = L.map("map").setView([-0.9, 100.35], 12);
+   L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    attribution:
+      "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+  }
+).addTo(map);
+
+
+// Fungsi untuk ambil warna berdasarkan menit
+function getColor(minutes) {
+  if (minutes <= 20) return "#2ECC71"; // sangat cepat
+  else if (minutes <= 30) return "#F1C40F"; // cepat
+  else if (minutes <= 40) return "#E67E22"; // sedang
+  else return "#E74C3C"; // lambat
+}
+
+// Data transportasi sekitar BIM
+var transportasi = [
+  ["Minibuses to Batusangkar", 100.350795, -0.899748, 25.332],
+  ["Buses to Payakumbuh", 100.350966, -0.905927, 26.16],
+  ["Flamboyan Baru", 100.350992, -0.900699, 25.45],
+  ["Lubuk Buaya", 100.327756, -0.833646, 15.782],
+  ["Indarung", 100.46748, -0.949968, 44.085],
+  ["Pauh Lima", 100.434931, -0.937841, 37.7],
+  ["Alai", 100.366292, -0.926369, 30.214],
+  ["Tabing", 100.3424, -0.866786, 20.632],
+  ["NPM", 100.350996, -0.924703, 28.729],
+  ["Pasar Raya", 100.358991, -0.951451, 32.9]
+  
+];
+
+// Tambahkan titik ke peta
+transportasi.forEach(function (item) {
+  var warna = getColor(item[3]);
+  var kategori =
+    item[3] <= 20
+      ? "Sangat Cepat"
+      : item[3] <= 30
+      ? "Cepat"
+      : item[3] <= 40
+      ? "Sedang"
+      : "Lambat";
+
+  L.circle([item[2], item[1]], {
+    color: warna,
+    fillColor: warna,
+    fillOpacity: 0.7,
+    radius: 100
+  })
+    .addTo(map)
+    .bindPopup(
+      `<b>${item[0]}</b><br>Waktu Tempuh: ${item[3]} menit<br>Kategori: ${kategori}`
+    );
+});
+
+
+    transportasi.forEach(function(item) {
+      L.marker([item[1], item[2]]).addTo(map).bindPopup(item[0]);
+    });
+
+// Tambahkan legenda
+var legend = L.control({ position: "bottomright" });
+
+legend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "info legend");
+  div.style.backgroundColor = "rgba(0, 0, 0, 0.6)"; // opsional: biar lebih kontras
+  div.style.padding = "8px";
+  div.style.borderRadius = "5px";
+  div.style.color = "white"; // ubah warna font jadi putih
+
+  div.innerHTML += "<h6 class='mb-1'>Kategori Waktu Tempuh</h6>";
+  div.innerHTML += '<i style="background: #2ECC71; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></i> Sangat Cepat<br>';
+  div.innerHTML += '<i style="background: #F1C40F; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></i> Cepat<br>';
+  div.innerHTML += '<i style="background: #E67E22; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></i> Sedang<br>';
+  div.innerHTML += '<i style="background: #E74C3C; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></i> Lambat<br>';
+
+  return div;
+};
+
+legend.addTo(map);
+
+
+
+    L.circle([-0.874, 100.351], {
+      radius: 500,
+      color: 'blue',
+      fillColor: '#30f',
+      fillOpacity: 0.4
+    }).addTo(map).bindPopup('Bandara Internasional Minangkabau (BIM)');
+  </script>
+</body>
+</html>
